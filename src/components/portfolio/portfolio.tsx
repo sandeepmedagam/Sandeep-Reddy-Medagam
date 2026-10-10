@@ -1,6 +1,5 @@
 import { useEffect, useState, type CSSProperties, type PointerEvent } from "react";
 import {
-  ArrowDown,
   ArrowUpRight,
   ChevronRight,
   ChevronsRight,
@@ -486,13 +485,6 @@ export function Portfolio() {
           </div>
           <div className="sticker location-sticker">
             <MapPin /> HYDERABAD, IN
-          </div>
-          <div className="hero-bottom mono">
-            <span className="scroll-label">
-              <ArrowDown />
-              SCROLL TO EXPLORE
-            </span>
-            <span>PRODUCT DESIGN · FRONTEND · GENAI</span>
           </div>
         </section>
         <section className="about-intro" id="about">

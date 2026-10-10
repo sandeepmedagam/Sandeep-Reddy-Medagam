@@ -1156,6 +1156,8 @@ main > section.talk-section > div.talk-copy > h2,
   text-align: center;
   overflow: visible;
   box-shadow: 0 16px 48px color-mix(in oklab, var(--foreground) 8%, transparent);
+  transform: none;
+  animation: none;
 }
 .contact-section:before {
   content: "";
@@ -1169,7 +1171,8 @@ main > section.talk-section > div.talk-copy > h2,
     var(--cta-ink) 230px 380px,
     transparent 380px 650px
   );
-  animation: stripe-drift 20s ease-in-out infinite alternate;
+  transform: none;
+  animation: none;
   pointer-events: none;
 }
 .contact-banner-btn {
@@ -1489,11 +1492,6 @@ footer.footer > p.footer-name,
 @keyframes sway {
   50% {
     transform: rotate(3deg);
-  }
-}
-@keyframes stripe-drift {
-  to {
-    transform: translateX(70px);
   }
 }
 @keyframes focus-card {
