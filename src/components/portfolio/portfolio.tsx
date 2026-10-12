@@ -1,4 +1,5 @@
-import { useEffect, useState, type CSSProperties, type PointerEvent } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import {
   ArrowUpRight,
   ChevronRight,
@@ -15,6 +16,14 @@ import {
   X,
   Zap,
 } from "lucide-react";
+import {
+  NavHomeIcon,
+  NavAboutIcon,
+  NavCaseStudyIcon,
+  NavServicesIcon,
+  NavJournalIcon,
+  NavPlaygroundIcon,
+} from "@/components/contact/contact-page";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -23,65 +32,64 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import mechanic from "@/assets/instant-mechanic.jpg";
-import check from "@/assets/true-check.jpg";
-import wellness from "@/assets/sa-wellness.jpg";
 import solar from "@/assets/solar-sea.jpg";
+import projectMeridianTrack from "@/assets/images/project_meridian_track_1791804688314.jpg";
+import projectStylebookPortrait from "@/assets/images/project_stylebook_portrait_1791804704703.jpg";
+import projectNorthlightDesert from "@/assets/images/project_northlight_desert_1791804719011.jpg";
 
 const projects = [
   {
-    name: "Instant Mechanic",
-    category: "MOBILITY / PRODUCT DESIGN",
-    description: "Making vehicle service feel simpler.",
-    tags: ["PRODUCT DESIGN", "UX / UI", "PROTOTYPING"],
-    tone: "yellow",
-    image: mechanic,
-  },
-  {
-    name: "True Check",
-    category: "FINTECH / USER EXPERIENCE",
-    description: "Fintech. Trust, clarity, and thoughtful interactions.",
-    tags: ["PRODUCT DESIGN", "UX / UI", "FINTECH"],
+    name: "Meridian Health",
+    number: "PROJECT 01",
+    date: "MAR 19, 2026",
+    category: "HEALTHCARE / WORKFLOW DESIGN",
+    description: "When therapists spend less time clicking, they have more time for patients.",
+    tags: ["HEALTHCARE", "WORKFLOW DESIGN"],
     tone: "cyan",
-    image: check,
+    image: projectMeridianTrack,
+    presenceTone: "orange",
   },
   {
-    name: "SA Wellness",
-    category: "HEALTH / DIGITAL EXPERIENCE",
-    description: "Health, brand, and digital experiences.",
-    tags: ["BRAND", "WEB DESIGN", "UI / UX"],
-    tone: "olive",
-    image: wellness,
+    name: "StyleBook",
+    number: "PROJECT 02",
+    date: "MAR 2, 2026",
+    category: "FINTECH / USER EXPERIENCE",
+    description: "From 'I hate this system' to 'Can we show other salons?'",
+    tags: ["FINTECH", "SALON OS"],
+    tone: "dark",
+    image: projectStylebookPortrait,
+    presenceTone: "orange",
   },
   {
     name: "Solar Sea",
+    number: "PROJECT 03",
+    date: "FEB 14, 2026",
     category: "IoT / DATA VISUALIZATION",
-    description: "Connected systems. Clearer perspectives.",
-    tags: ["INTERACTION", "DATA VISUALIZATION", "IoT"],
-    tone: "blue",
-    image: solar,
-  },
-  {
-    name: "SuccessWikis",
-    category: "SAAS / PRODUCT / WEB",
-    description: "Product thinking for knowledge and growth.",
-    tags: ["SAAS", "PRODUCT DESIGN", "WEB"],
+    description: "Connected sensors, fluid oceans, and real-time telemetry.",
+    tags: ["IoT", "DATA VISUALIZATION"],
     tone: "yellow",
-    image: undefined,
+    image: solar,
+    presenceTone: "cyan",
   },
   {
-    name: "Cricket Scoring Platform",
-    category: "SPORTS / PRODUCT / DATA",
-    description: "Sport, scores, and every little detail.",
-    tags: ["PRODUCT DESIGN", "DATA", "UI / UX"],
-    tone: "mint",
-    image: undefined,
+    name: "North Light",
+    number: "PROJECT 04",
+    date: "MAR 19, 2026",
+    category: "ENTERPRISE / PRODUCT DESIGN",
+    description: "Getting seven stakeholders to agree on what they're actually building.",
+    tags: ["STRATEGY", "ENTERPRISE"],
+    tone: "pink",
+    image: projectNorthlightDesert,
+    presenceTone: "emerald",
   },
 ];
 const nav = [
-  { id: "home", label: "HOME", icon: Home },
-  { id: "about", label: "ABOUT", icon: Flower2 },
-  { id: "work", label: "WORK", icon: Layers },
+  { id: "home", label: "HOME", icon: NavHomeIcon },
+  { id: "about", label: "ABOUT", icon: NavAboutIcon },
+  { id: "work", label: "CASE STUDY", icon: NavCaseStudyIcon },
+  { id: "services", label: "SERVICES", icon: NavServicesIcon, targetId: "work" },
+  { id: "journal", label: "JOURNAL", icon: NavJournalIcon, targetId: "work" },
+  { id: "playground", label: "PLAYGROUND", icon: NavPlaygroundIcon, isPlayground: true },
 ];
 function Mark() {
   return (
@@ -233,6 +241,108 @@ export function Portfolio() {
   const [cursorVisible, setCursorVisible] = useState(false);
   const [cursorInteracting, setCursorInteracting] = useState(false);
 
+  const topRulerTrackRef = useRef<HTMLDivElement>(null);
+  const footerScaleTrackRef = useRef<HTMLDivElement>(null);
+
+  // Position offsets (px) - centered range for bidirectional scrolling
+  const heroCurrentOffsetRef = useRef(-200);
+  const footerCurrentOffsetRef = useRef(-200);
+
+  // Velocity (px per frame)
+  const heroVelocityRef = useRef(0);
+  const footerVelocityRef = useRef(0);
+
+  // Pointer position and time tracking for velocity measurement
+  const lastPointerXRef = useRef<number | null>(null);
+  const lastPointerTimeRef = useRef(0);
+
+  const handleScaleMotion = (clientX: number) => {
+    const now = performance.now();
+    if (lastPointerXRef.current !== null) {
+      const dt = now - lastPointerTimeRef.current;
+      if (dt >= 4 && dt < 160) {
+        const dx = clientX - lastPointerXRef.current;
+        // Slow, refined displacement: moving left/right shifts scale gently
+        heroCurrentOffsetRef.current += dx * 0.16;
+        footerCurrentOffsetRef.current += dx * 0.16;
+
+        // Controlled, gentle velocity measurement
+        const instantV = Math.max(-8, Math.min(8, (dx / dt) * 2.8));
+        heroVelocityRef.current = heroVelocityRef.current * 0.78 + instantV * 0.22;
+        footerVelocityRef.current = footerVelocityRef.current * 0.78 + instantV * 0.22;
+      }
+    }
+    lastPointerXRef.current = clientX;
+    lastPointerTimeRef.current = now;
+  };
+
+  useEffect(() => {
+    let animId: number;
+    // Luxurious slow damping factor for smooth coasting
+    const DAMPING = 0.958;
+    const MIN_OFFSET = -1200;
+    const MAX_OFFSET = 600;
+
+    const tick = () => {
+      const now = performance.now();
+      // If pointer hasn't moved in > 75ms, cursor movement has ceased -> coast on remaining velocity
+      if (now - lastPointerTimeRef.current > 75) {
+        lastPointerXRef.current = null;
+      }
+
+      // 1. Top ruler velocity dampening and gentle spring
+      if (Math.abs(heroVelocityRef.current) > 0.01) {
+        heroCurrentOffsetRef.current += heroVelocityRef.current;
+        heroVelocityRef.current *= DAMPING;
+      } else {
+        heroVelocityRef.current = 0;
+      }
+
+      if (heroCurrentOffsetRef.current < MIN_OFFSET) {
+        const over = MIN_OFFSET - heroCurrentOffsetRef.current;
+        heroVelocityRef.current += over * 0.05;
+        heroVelocityRef.current *= 0.8;
+      } else if (heroCurrentOffsetRef.current > MAX_OFFSET) {
+        const over = MAX_OFFSET - heroCurrentOffsetRef.current;
+        heroVelocityRef.current += over * 0.05;
+        heroVelocityRef.current *= 0.8;
+      }
+
+      if (topRulerTrackRef.current) {
+        topRulerTrackRef.current.style.transform = `translate3d(${heroCurrentOffsetRef.current.toFixed(2)}px, 0, 0)`;
+      }
+
+      // 2. Footer scale velocity dampening and gentle spring
+      if (Math.abs(footerVelocityRef.current) > 0.01) {
+        footerCurrentOffsetRef.current += footerVelocityRef.current;
+        footerVelocityRef.current *= DAMPING;
+      } else {
+        footerVelocityRef.current = 0;
+      }
+
+      if (footerCurrentOffsetRef.current < MIN_OFFSET) {
+        const over = MIN_OFFSET - footerCurrentOffsetRef.current;
+        footerVelocityRef.current += over * 0.05;
+        footerVelocityRef.current *= 0.8;
+      } else if (footerCurrentOffsetRef.current > MAX_OFFSET) {
+        const over = MAX_OFFSET - footerCurrentOffsetRef.current;
+        footerVelocityRef.current += over * 0.05;
+        footerVelocityRef.current *= 0.8;
+      }
+
+      if (footerScaleTrackRef.current) {
+        footerScaleTrackRef.current.style.transform = `translate3d(${footerCurrentOffsetRef.current.toFixed(2)}px, 0, 0)`;
+      }
+
+      animId = requestAnimationFrame(tick);
+    };
+
+    animId = requestAnimationFrame(tick);
+    return () => {
+      if (animId) cancelAnimationFrame(animId);
+    };
+  }, []);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     const isCoarse = window.matchMedia("(pointer: coarse)").matches;
@@ -248,10 +358,12 @@ export function Portfolio() {
         );
         setCursorInteracting(isClickable);
       }
+      handleScaleMotion(e.clientX);
     };
 
     const handleMouseLeave = () => {
       setCursorVisible(false);
+      lastPointerXRef.current = null;
     };
 
     window.addEventListener("mousemove", handlePointerMove, { passive: true });
@@ -292,8 +404,11 @@ export function Portfolio() {
       window.clearInterval(interval);
     };
   }, []);
+  const navigate = useNavigate();
   const selected = projects.find((p) => p.name === dialog);
-  const contact = () => setDialog("contact");
+  const contact = () => {
+    navigate({ to: "/contact" });
+  };
   const handleHeroPointerMove = (event: PointerEvent<HTMLElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
     const x = ((event.clientX - rect.left) / rect.width - 0.5) * 2;
@@ -302,6 +417,11 @@ export function Portfolio() {
     event.currentTarget.style.setProperty("--hero-scale-x", x.toFixed(3));
     event.currentTarget.style.setProperty("--hero-scale-y", y.toFixed(3));
     event.currentTarget.style.setProperty("--hero-scale", scale);
+
+    handleScaleMotion(event.clientX);
+  };
+  const handleFooterPointerMove = (event: PointerEvent<HTMLElement>) => {
+    handleScaleMotion(event.clientX);
   };
   const resetHeroPointer = ({ currentTarget }: PointerEvent<HTMLElement>) => {
     currentTarget.style.setProperty("--hero-scale-x", "0");
@@ -327,18 +447,21 @@ export function Portfolio() {
           <Mark />
         </a>
         <nav className="nav-links" aria-label="Main navigation">
-          {nav.map(({ id, label, icon: Icon }) => (
-            <Button key={id} variant="toolbar" className={active === id ? "active" : ""} asChild>
-              <a href={`#${id}`}>
+          {nav.map(({ id, label, icon: Icon, targetId, isPlayground }) =>
+            isPlayground ? (
+              <Button key={id} variant="toolbar" onClick={() => setDialog("playground")}>
                 <Icon />
                 {label}
-              </a>
-            </Button>
-          ))}
-          <Button variant="toolbar" onClick={() => setDialog("playground")}>
-            <Sparkles />
-            PLAYGROUND
-          </Button>
+              </Button>
+            ) : (
+              <Button key={id} variant="toolbar" className={active === id ? "active" : ""} asChild>
+                <a href={`#${targetId || id}`}>
+                  <Icon />
+                  {label}
+                </a>
+              </Button>
+            ),
+          )}
         </nav>
         <div className="nav-right">
           <div className="nav-contacts-group" aria-label="Quick contact links">
@@ -410,24 +533,28 @@ export function Portfolio() {
       </header>
       {menu && (
         <nav className="mobile-links" aria-label="Mobile navigation">
-          {nav.map(({ id, label, icon: Icon }) => (
-            <Button key={id} variant="toolbar" asChild>
-              <a href={`#${id}`} onClick={() => setMenu(false)}>
+          {nav.map(({ id, label, icon: Icon, targetId, isPlayground }) =>
+            isPlayground ? (
+              <Button
+                key={id}
+                variant="toolbar"
+                onClick={() => {
+                  setMenu(false);
+                  setDialog("playground");
+                }}
+              >
                 <Icon />
                 {label}
-              </a>
-            </Button>
-          ))}
-          <Button
-            variant="toolbar"
-            onClick={() => {
-              setMenu(false);
-              setDialog("playground");
-            }}
-          >
-            <Sparkles />
-            PLAYGROUND
-          </Button>
+              </Button>
+            ) : (
+              <Button key={id} variant="toolbar" asChild>
+                <a href={`#${targetId || id}`} onClick={() => setMenu(false)}>
+                  <Icon />
+                  {label}
+                </a>
+              </Button>
+            ),
+          )}
           <Button
             variant="toolbar"
             onClick={() => {
@@ -441,10 +568,24 @@ export function Portfolio() {
         </nav>
       )}
       <main className="canvas">
-        <div className="ruler" aria-hidden="true">
-          {Array.from({ length: 16 }, (_, i) => (
-            <span key={i}>{i * 100}</span>
-          ))}
+        <div
+          className="ruler"
+          aria-hidden="true"
+          onPointerMove={(e) => {
+            handleScaleMotion(e.clientX);
+          }}
+        >
+          <div
+            className="ruler-track"
+            ref={topRulerTrackRef}
+            style={{ transform: "translate3d(0px, 0, 0)" }}
+          >
+            {Array.from({ length: 36 }, (_, i) => (
+              <span key={i} className="ruler-step">
+                {i * 100}
+              </span>
+            ))}
+          </div>
         </div>
         <section
           className="hero"
@@ -479,7 +620,7 @@ export function Portfolio() {
             <br />
             feel simple <span className="inline-flower">✳</span>.
           </h2>
-          <ContactButton onClick={contact} />
+          <ContactButton onClick={contact} label="LET'S TALK" />
           <div className="sticker role-sticker">
             PRODUCT DESIGNER <span>↗</span>
           </div>
@@ -532,7 +673,7 @@ export function Portfolio() {
             <h2 className="display">
               SELECTED
               <br />
-              WORK <sup>(06)</sup>
+              WORK <sup>(04)</sup>
             </h2>
             <p>
               A selection of products, interfaces and experiences across healthcare, fintech,
@@ -544,39 +685,84 @@ export function Portfolio() {
               <article
                 key={p.name}
                 id={`project-${i + 1}`}
-                className={`project project-${p.tone}`}
+                className={`folder-card folder-${p.tone}`}
                 style={{ "--stack-index": i } as CSSProperties}
               >
-                <div className="project-copy">
-                  <div className="project-number mono">
-                    <span>PROJECT 0{i + 1}</span>
-                    <ArrowUpRight size={17} />
-                  </div>
-                  <h3>{p.name}</h3>
-                  <span className="mono">{p.category}</span>
-                  <p>{p.description}</p>
-                  <div className="project-tags">
-                    {p.tags.map((t) => (
-                      <span key={t}>{t}</span>
-                    ))}
-                  </div>
-                  <Button variant="studio" onClick={() => setDialog(p.name)}>
-                    EXPLORE PROJECT
-                    <ArrowUpRight />
-                  </Button>
+                {/* Protruding Folder Tab Header */}
+                <div className="folder-tab-bar" aria-hidden="true">
+                  <button
+                    type="button"
+                    className="folder-tab"
+                    style={{
+                      left: `calc(${i} * min(205px, 23vw))`,
+                    }}
+                    onClick={() => {
+                      const el = document.getElementById(`project-${i + 1}`);
+                      if (el) {
+                        el.scrollIntoView({ behavior: "smooth", block: "start" });
+                      }
+                    }}
+                    aria-label={`Jump to ${p.number}`}
+                  >
+                    <NavPlaygroundIcon />
+                    <span className="mono">{p.number}</span>
+                  </button>
                 </div>
-                <div className="project-image">
-                  {p.image ? (
-                    <img
-                      src={p.image}
-                      alt={`${p.name} illustrative interface concept`}
-                      width={1200}
-                      height={1008}
-                      loading="lazy"
-                    />
-                  ) : (
-                    <Concept kind={p.name} />
-                  )}
+
+                {/* Main Folder Card Body */}
+                <div className="folder-card-body">
+                  {/* Left Column: Metadata, Title, Description, Link, Bottom Tags */}
+                  <div className="folder-col-left">
+                    <div className="folder-date mono">
+                      <span className="folder-date-dot" />
+                      <span>{p.date}</span>
+                    </div>
+
+                    <h3 className="folder-title">{p.name}</h3>
+
+                    <p className="folder-description">{p.description}</p>
+
+                    <button
+                      type="button"
+                      className="folder-view-btn mono"
+                      onClick={() => setDialog(p.name)}
+                    >
+                      <span>VIEW PROJECT</span>
+                      <span className="folder-arrow">↗</span>
+                    </button>
+
+                    <div className="folder-bottom-tags">
+                      {p.tags.map((tag) => (
+                        <span key={tag} className="folder-tag mono">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Right Column: Image with Selection Bounding Box & Handles */}
+                  <div className="folder-col-right">
+                    <div className="folder-image-bounding-box">
+                      {/* 4 Corner handles */}
+                      <span className="box-handle handle-tl" aria-hidden="true" />
+                      <span className="box-handle handle-tr" aria-hidden="true" />
+                      <span className="box-handle handle-bl" aria-hidden="true" />
+                      <span className="box-handle handle-br" aria-hidden="true" />
+
+                      {/* Top-Right File Pill Badge */}
+                      <div className="folder-file-badge mono" aria-hidden="true">
+                        <span className="file-badge-icon">JPG</span>
+                        <span>IMAGE . JPG</span>
+                      </div>
+
+                      <img
+                        src={p.image}
+                        alt={`${p.name} interface visual`}
+                        className="folder-card-img"
+                        loading="lazy"
+                      />
+                    </div>
+                  </div>
                 </div>
               </article>
             ))}
@@ -630,14 +816,10 @@ export function Portfolio() {
               </div>
             </div>
           </div>
-          <h1
+          <button
+            type="button"
             className="contact-banner-btn"
             onClick={contact}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") contact();
-            }}
             aria-label="Contact Sandy"
           >
             <span className="banner-badge" aria-hidden="true">
@@ -651,21 +833,33 @@ export function Portfolio() {
                 <ChevronsRight className="badge-chevrons" />
               </span>
             </span>
-          </h1>
+          </button>
         </section>
-        <footer className="footer">
+        <footer className="footer" onPointerMove={handleFooterPointerMove}>
           <p className="display footer-name">SANDY</p>
           <span className="mono">PRODUCT DESIGN × CODE × AI</span>
           <nav className="footer-links" aria-label="Footer navigation">
             <a href="#home">HOME</a>
             <a href="#about">ABOUT</a>
             <a href="#work">WORK</a>
-            <a href="#contact">CONTACT ↗</a>
+            <a href="/contact">CONTACT ↗</a>
           </nav>
-          <div className="footer-scale" aria-hidden="true">
-            {Array.from({ length: 16 }, (_, i) => (
-              <span key={i}>{i * 100}</span>
-            ))}
+          <div className="footer-scale" aria-hidden="true" onPointerMove={handleFooterPointerMove}>
+            <div
+              className="footer-scale-track"
+              ref={footerScaleTrackRef}
+              style={{ transform: "translate3d(0px, 0, 0)" }}
+            >
+              {Array.from({ length: 36 }, (_, i) => (
+                <span key={i} className="footer-scale-segment">
+                  <span className="scale-line scale-line-sub start" />
+                  <span className="scale-line scale-line-major" />
+                  <span className="scale-line scale-line-sub end" />
+                  <span className="scale-value">{i * 100}</span>
+                  <span className="scale-line scale-line-bottom" />
+                </span>
+              ))}
+            </div>
           </div>
         </footer>
       </main>
