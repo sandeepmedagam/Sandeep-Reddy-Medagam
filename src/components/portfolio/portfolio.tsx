@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import {
   ArrowUpRight,
   ChevronRight,
@@ -449,9 +449,32 @@ export function Portfolio() {
         <nav className="nav-links" aria-label="Main navigation">
           {nav.map(({ id, label, icon: Icon, targetId, isPlayground }) =>
             isPlayground ? (
-              <Button key={id} variant="toolbar" onClick={() => setDialog("playground")}>
-                <Icon />
-                {label}
+              <Button key={id} variant="toolbar" asChild>
+                <Link to="/playground">
+                  <Icon />
+                  {label}
+                </Link>
+              </Button>
+            ) : id === "about" ? (
+              <Button key={id} variant="toolbar" asChild>
+                <Link to="/about">
+                  <Icon />
+                  {label}
+                </Link>
+              </Button>
+            ) : id === "work" ? (
+              <Button key={id} variant="toolbar" asChild>
+                <Link to="/case-study">
+                  <Icon />
+                  {label}
+                </Link>
+              </Button>
+            ) : id === "journal" ? (
+              <Button key={id} variant="toolbar" asChild>
+                <Link to="/journal">
+                  <Icon />
+                  {label}
+                </Link>
               </Button>
             ) : (
               <Button key={id} variant="toolbar" className={active === id ? "active" : ""} asChild>
@@ -535,16 +558,32 @@ export function Portfolio() {
         <nav className="mobile-links" aria-label="Mobile navigation">
           {nav.map(({ id, label, icon: Icon, targetId, isPlayground }) =>
             isPlayground ? (
-              <Button
-                key={id}
-                variant="toolbar"
-                onClick={() => {
-                  setMenu(false);
-                  setDialog("playground");
-                }}
-              >
-                <Icon />
-                {label}
+              <Button key={id} variant="toolbar" asChild>
+                <Link to="/playground" onClick={() => setMenu(false)}>
+                  <Icon />
+                  {label}
+                </Link>
+              </Button>
+            ) : id === "about" ? (
+              <Button key={id} variant="toolbar" asChild>
+                <Link to="/about" onClick={() => setMenu(false)}>
+                  <Icon />
+                  {label}
+                </Link>
+              </Button>
+            ) : id === "work" ? (
+              <Button key={id} variant="toolbar" asChild>
+                <Link to="/case-study" onClick={() => setMenu(false)}>
+                  <Icon />
+                  {label}
+                </Link>
+              </Button>
+            ) : id === "journal" ? (
+              <Button key={id} variant="toolbar" asChild>
+                <Link to="/journal" onClick={() => setMenu(false)}>
+                  <Icon />
+                  {label}
+                </Link>
               </Button>
             ) : (
               <Button key={id} variant="toolbar" asChild>
@@ -839,10 +878,12 @@ export function Portfolio() {
           <p className="display footer-name">SANDY</p>
           <span className="mono">PRODUCT DESIGN × CODE × AI</span>
           <nav className="footer-links" aria-label="Footer navigation">
-            <a href="#home">HOME</a>
-            <a href="#about">ABOUT</a>
-            <a href="#work">WORK</a>
-            <a href="/contact">CONTACT ↗</a>
+            <a href="/#home">HOME</a>
+            <Link to="/about">ABOUT</Link>
+            <Link to="/case-study">CASE STUDY</Link>
+            <Link to="/journal">JOURNAL</Link>
+            <Link to="/playground">PLAYGROUND</Link>
+            <Link to="/contact">CONTACT ↗</Link>
           </nav>
           <div className="footer-scale" aria-hidden="true" onPointerMove={handleFooterPointerMove}>
             <div

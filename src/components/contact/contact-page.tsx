@@ -235,38 +235,40 @@ export function ContactPage() {
         </Link>
         <nav className="nav-links" aria-label="Main navigation">
           <Button variant="toolbar" asChild>
-            <Link to="/">
+            <Link to="/" activeOptions={{ exact: true }}>
               <NavHomeIcon />
               HOME
             </Link>
           </Button>
           <Button variant="toolbar" asChild>
-            <a href="/#about">
+            <Link to="/about">
               <NavAboutIcon />
               ABOUT
-            </a>
+            </Link>
           </Button>
           <Button variant="toolbar" asChild>
-            <a href="/#work">
+            <Link to="/case-study">
               <NavCaseStudyIcon />
               CASE STUDY
-            </a>
+            </Link>
           </Button>
           <Button variant="toolbar" asChild>
-            <a href="/#work">
+            <a href="/#services">
               <NavServicesIcon />
               SERVICES
             </a>
           </Button>
           <Button variant="toolbar" asChild>
-            <a href="/#work">
+            <Link to="/journal">
               <NavJournalIcon />
               JOURNAL
-            </a>
+            </Link>
           </Button>
-          <Button variant="toolbar" onClick={() => setPlaygroundOpen(true)}>
-            <NavPlaygroundIcon />
-            PLAYGROUND
+          <Button variant="toolbar" asChild>
+            <Link to="/playground">
+              <NavPlaygroundIcon />
+              PLAYGROUND
+            </Link>
           </Button>
         </nav>
 

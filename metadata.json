@@ -1,0 +1,6 @@
+{
+  "name": "Sandeep Reddy Medagam Portfolio",
+  "description": "Product designer portfolio showcasing design systems, GenAI prototypes, case studies, and playground experiments.",
+  "permissions": [],
+  "capabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
