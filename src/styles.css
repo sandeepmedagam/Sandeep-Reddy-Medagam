@@ -3898,6 +3898,10 @@ div:nth-of-type(1)
   pointer-events: none;
 }
 
+.playground-canvas-plane.is-resetting {
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
 /* Movable Element Box: clean stable hover & drag without glitchy animation transitions */
 .playground-canvas-item {
   position: absolute;

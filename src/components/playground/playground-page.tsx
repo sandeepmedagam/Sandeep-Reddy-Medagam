@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -306,6 +306,7 @@ export function PlaygroundPage() {
   // Infinite Canvas Zoom & Pan via cursor wheel
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 40, y: 30 });
+  const [isResetting, setIsResetting] = useState(false);
   const isPanningRef = useRef(false);
   const panStartRef = useRef({ x: 0, y: 0, panX: 0, panY: 0 });
 
@@ -381,6 +382,59 @@ export function PlaygroundPage() {
     return () => {
       canvasEl.removeEventListener("wheel", handleWheel);
     };
+  }, []);
+
+  // Reset View: restores canvas zoom level to 1 and centers the pan coordinates
+  const handleResetView = useCallback(() => {
+    if (!canvasRef.current) {
+      setZoom(1);
+      setPan({ x: 0, y: 0 });
+      return;
+    }
+    const rect = canvasRef.current.getBoundingClientRect();
+    // Centering bounding box of all elements (content center ~ x:772, y:678)
+    const centeredX = Math.round(rect.width / 2 - 772);
+    const centeredY = Math.round(rect.height / 2 - 678);
+
+    setIsResetting(true);
+    setZoom(1);
+    setPan({ x: centeredX, y: centeredY });
+    playBlip(620);
+
+    setTimeout(() => {
+      setIsResetting(false);
+    }, 280);
+  }, []);
+
+  // Press 'R' key to trigger Reset View
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement ||
+        (e.target as HTMLElement)?.isContentEditable
+      ) {
+        return;
+      }
+
+      if (e.key === "r" || e.key === "R") {
+        e.preventDefault();
+        handleResetView();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleResetView]);
+
+  // Center pan coordinates on initial load
+  useEffect(() => {
+    if (canvasRef.current) {
+      const rect = canvasRef.current.getBoundingClientRect();
+      const centeredX = Math.round(rect.width / 2 - 772);
+      const centeredY = Math.round(rect.height / 2 - 678);
+      setPan({ x: centeredX, y: centeredY });
+    }
   }, []);
 
   // Top ruler inertia tracking
@@ -631,7 +685,7 @@ export function PlaygroundPage() {
 
         {/* Movable Objects Layer (Smooth Zoom and Pan Transformation) */}
         <div
-          className="playground-canvas-plane"
+          className={`playground-canvas-plane ${isResetting ? "is-resetting" : ""}`}
           style={{
             transform: `translate3d(${pan.x}px, ${pan.y}px, 0) scale(${zoom})`,
             transformOrigin: "0 0",
