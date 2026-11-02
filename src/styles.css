@@ -409,7 +409,7 @@ a:focus-visible {
 .name-selection {
   position: relative;
   width: 620px;
-  border: 2px solid var(--primary);
+  border: 1.5px solid #d9531e;
   padding: 26px 18px 18px;
 }
 main > section#home > div.name-selection > h1,
@@ -428,21 +428,195 @@ main > section#home > div.name-selection > h1,
   background: var(--primary);
   border: 1.5px solid var(--foreground);
 }
-.handle:nth-of-type(1) {
+.handle.handle-orange {
+  background: #ea580c;
+  border: 1.5px solid #ffffff;
+}
+.handle:nth-of-type(1),
+.handle.handle-tl {
   top: -6px;
   left: -6px;
 }
-.handle:nth-of-type(2) {
+.handle:nth-of-type(2),
+.handle.handle-tr {
   top: -6px;
   right: -6px;
 }
-.handle:nth-of-type(3) {
+.handle:nth-of-type(3),
+.handle.handle-bl {
   bottom: -6px;
   left: -6px;
 }
-.handle:nth-of-type(4) {
+.handle:nth-of-type(4),
+.handle.handle-br {
   bottom: -6px;
   right: -6px;
+}
+
+/* Interactive Name Hover Selection Overlay (Matching image_3129bc2a.png) */
+.name-selection-interactive {
+  position: relative;
+  overflow: visible;
+  cursor: crosshair;
+}
+
+.name-selection-overlay {
+  position: absolute;
+  background: #000000;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 10;
+  transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
+}
+
+.name-inverted-wrapper {
+  position: absolute;
+  pointer-events: none;
+  padding: 26px 18px 18px;
+  box-sizing: border-box;
+}
+
+.name-text-inverted {
+  color: #ffffff !important;
+}
+
+.name-plum-sticker {
+  position: absolute;
+  top: 14px;
+  left: -20px;
+  background: #4a1936;
+  color: #ffffff;
+  padding: 8px 18px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  transform: rotate(-9deg);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 12;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  border-radius: 2px;
+}
+
+.name-yellow-sticker {
+  position: absolute;
+  top: -12px;
+  right: -24px;
+  background: #fde68a;
+  color: #111111;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 7px 16px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  transform: rotate(5deg);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 8;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  border-radius: 2px;
+}
+
+/* 4 Corner Square Handles */
+.selection-handle {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  background: #000000;
+  border: 1px solid #ffffff;
+  z-index: 12;
+}
+
+.selection-handle.handle-tl {
+  top: -4px;
+  left: -4px;
+}
+.selection-handle.handle-tr {
+  top: -4px;
+  right: -4px;
+}
+.selection-handle.handle-bl {
+  bottom: -4px;
+  left: -4px;
+}
+.selection-handle.handle-br {
+  bottom: -4px;
+  right: -4px;
+}
+
+/* Black pill badge with YOU at the cursor */
+.selection-cursor-badge {
+  position: absolute;
+  bottom: -22px;
+  right: -6px;
+  background: #000000;
+  color: #ffffff;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 2px 7px;
+  border-radius: 4px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 13;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+/* Interactive Sandy Organic Clover Container (Matching image_3282a42b.png) */
+.sandy-organic-interactive-container {
+  width: 330px;
+  height: 340px;
+  position: relative;
+  overflow: visible;
+  cursor: crosshair;
+}
+
+.sandy-organic-interactive-container .base-layer {
+  position: absolute;
+  inset: 0;
+}
+
+.organic-selection-box {
+  position: absolute;
+  background: #000000;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 10;
+  transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
+}
+
+.organic-inverted-wrapper {
+  position: absolute;
+  pointer-events: none;
+}
+
+.magenta-layer .lobe {
+  background: #a8326a !important;
+  border: 2px solid #ffffff !important;
+}
+
+.magenta-layer .organic-center {
+  background: #a8326a !important;
+}
+
+.magenta-layer .organic-eyes i {
+  background: #f0ede6 !important;
+}
+
+.organic-magenta-handle {
+  position: absolute;
+  bottom: 24px;
+  left: 20px;
+  width: 9px;
+  height: 9px;
+  background: #a8326a;
+  border: 1.5px solid #a8326a;
+  z-index: 5;
 }
 .selection-size {
   position: absolute;
@@ -824,7 +998,9 @@ main:nth-of-type(1) > section#about:nth-of-type(2) > p:nth-of-type(1),
   background: var(--mint);
 }
 .work-section {
-  padding: 90px 6% 80px;
+  padding: 90px 3% 80px;
+  max-width: 1560px;
+  margin: 0 auto;
   border-top: none;
 }
 .work-heading {
@@ -930,7 +1106,7 @@ article#project-1,
   z-index: calc(var(--stack-index) + 1);
   margin-bottom: 70vh;
   width: 100%;
-  max-width: 1300px;
+  max-width: 1480px;
   margin-left: auto;
   margin-right: auto;
   transition:
@@ -988,9 +1164,9 @@ article#project-1,
 /* Folder Card Body */
 .folder-card-body {
   width: 100%;
-  min-height: 520px;
+  min-height: 580px;
   display: grid;
-  grid-template-columns: 46% 54%;
+  grid-template-columns: 44% 56%;
   padding: 0;
   box-sizing: border-box;
   position: relative;
@@ -3034,9 +3210,10 @@ div:nth-of-type(1)
 /* Big Page Wordmark: ABOUT */
 .about-title-wrapper {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   margin: 10px auto 44px;
   max-width: 900px;
+  padding: 0 16px;
 }
 
 .about-page-title {
@@ -3044,7 +3221,7 @@ div:nth-of-type(1)
   font-weight: 1000;
   letter-spacing: -0.04em;
   line-height: 0.88;
-  text-align: center;
+  text-align: left;
   color: var(--foreground);
   margin: 0;
   user-select: none;
@@ -3323,8 +3500,8 @@ div:nth-of-type(1)
   flex-shrink: 0;
 }
 
-/* SECTION 3: WORK / TIMELINE */
-.work-section {
+/* SECTION 3: WORK / TIMELINE (ABOUT PAGE) */
+.about-section.work-section {
   max-width: 880px;
   margin: 0 auto 90px;
   scroll-margin-top: 100px;
@@ -3490,8 +3667,10 @@ div:nth-of-type(1)
 }
 
 .case-study-hero {
-  padding: 64px 20px 48px;
-  text-align: center;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 64px 4% 40px;
+  text-align: left;
 }
 
 .case-study-main-title {
@@ -3502,7 +3681,8 @@ div:nth-of-type(1)
   letter-spacing: -0.015em;
   color: #000;
   text-transform: uppercase;
-  margin: 0 auto;
+  margin: 0;
+  text-align: left;
 }
 
 .case-study-grid-section {

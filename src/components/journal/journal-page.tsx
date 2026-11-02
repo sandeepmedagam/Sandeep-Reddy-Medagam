@@ -26,6 +26,7 @@ import {
   NavPlaygroundIcon,
 } from "@/components/contact/contact-page";
 import { Button } from "@/components/ui/button";
+import { SandyOrganic } from "@/components/ui/interactive-organic";
 import {
   Dialog,
   DialogContent,
@@ -618,17 +619,7 @@ export function JournalPage() {
 
         {/* CONTINUOUS: LET'S TALK SECTION (STANDARDIZED WITH HOMEPAGE, ABOUT, CASE STUDY) */}
         <section className="talk-section" aria-label="Let's talk">
-          <div className="sandy-organic" aria-hidden="true">
-            <i className="lobe" />
-            <i className="lobe" />
-            <i className="lobe" />
-            <i className="lobe" />
-            <div className="organic-center" />
-            <span className="organic-eyes">
-              <i />
-              <i />
-            </span>
-          </div>
+          <SandyOrganic />
           <div className="talk-copy">
             <h2 className="display">LET'S TALK</h2>
             <p>

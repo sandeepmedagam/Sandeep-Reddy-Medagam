@@ -32,6 +32,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { InteractiveName } from "@/components/ui/interactive-name";
+import { SandyOrganic } from "@/components/ui/interactive-organic";
 import solar from "@/assets/solar-sea.jpg";
 import projectMeridianTrack from "@/assets/images/project_meridian_track_1791804688314.jpg";
 import projectStylebookPortrait from "@/assets/images/project_stylebook_portrait_1791804704703.jpg";
@@ -638,10 +640,7 @@ export function Portfolio() {
           <p className="hero-intro">hello, my name is</p>
           <div className="sticker note-mint">PRODUCT DESIGN × CODE</div>
           <div className="sticker note-yellow">A LITTLE HUMAN. A LITTLE AI.</div>
-          <div className="name-selection">
-            <h1 className="display">SANDY</h1>
-            <Handles />
-          </div>
+          <InteractiveName />
           {/* Location-type profile image visual elements flanking hero */}
           <HeroPinAvatar className="pin-left" message="Hello my friends" />
           <HeroPinAvatar className="pin-right" message="have a nice day!" />
@@ -808,17 +807,7 @@ export function Portfolio() {
           </div>
         </section>
         <section className="talk-section">
-          <div className="sandy-organic" aria-hidden="true">
-            <i className="lobe" />
-            <i className="lobe" />
-            <i className="lobe" />
-            <i className="lobe" />
-            <div className="organic-center" />
-            <span className="organic-eyes">
-              <i />
-              <i />
-            </span>
-          </div>
+          <SandyOrganic />
           <div className="talk-copy">
             <h2 className="display">LET'S TALK</h2>
             <p>
